@@ -6,16 +6,45 @@
     <title>Executive Admin | Rocky House</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --gold: #f39c12; --onyx: #0a0a0a; --white: #ffffff; --glass: rgba(255, 255, 255, 0.05); --sidebar-width: 280px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #050505; color: var(--white); min-height: 100vh; overflow-x: hidden; }
 
-        .menu-toggle { position: fixed; top: 20px; left: 20px; z-index: 2000; background: var(--gold); color: black; border: none; padding: 10px 12px; border-radius: 5px; cursor: pointer; display: block; }
-        .sidebar { width: var(--sidebar-width); background: var(--onyx); border-right: 1px solid rgba(255,255,255,0.05); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; left: -100%; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1500; }
+    <style>
+        /* --- LUXURY COLOR PALETTE --- */
+        :root { 
+            --gold: #f39c12; 
+            --onyx: #0a0a0a; 
+            --white: #ffffff; 
+            --glass: rgba(255, 255, 255, 0.05); 
+            --sidebar-width: 280px; 
+            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- GLOBAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #050505; 
+            color: var(--white); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+
+        /* --- NAVIGATION & SIDEBAR --- */
+        .menu-toggle { 
+            position: fixed; top: 20px; left: 20px; z-index: 2000; 
+            background: var(--gold); color: black; border: none; 
+            padding: 10px 12px; border-radius: 5px; cursor: pointer; 
+            display: block; 
+        }
+
+        .sidebar { 
+            width: var(--sidebar-width); background: var(--onyx); 
+            border-right: 1px solid rgba(255,255,255,0.05); padding: 30px 20px; 
+            display: flex; flex-direction: column; position: fixed; 
+            height: 100vh; left: -100%; transition: var(--transition); z-index: 1500; 
+        }
+
         .sidebar.active { left: 0; }
 
         .admin-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-top: 40px; }
@@ -27,16 +56,19 @@
         .nav-item { padding: 15px; color: #888; text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 15px; transition: 0.3s; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
         .nav-item:hover, .nav-item.active { background: var(--glass); color: var(--gold); }
 
-        .main-content { padding: 80px 20px 40px; width: 100%; transition: 0.4s; }
+        /* --- MAIN LAYOUT --- */
+        .main-content { padding: 80px 20px 40px; width: 100%; transition: var(--transition); }
         .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; }
         .header p { font-size: 0.7rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
 
+        /* --- STAT CARDS --- */
         .stats-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 30px 0; }
         .stat-card { background: var(--onyx); padding: 20px; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; }
         .stat-card h4 { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .stat-card p { font-size: 1.4rem; font-weight: 600; color: var(--gold); }
         .cat-detail { font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; margin-top: 5px;}
 
+        /* --- UPLOAD BOX --- */
         .admin-box { background: var(--onyx); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .upload-area { border: 2px dashed #333; padding: 30px; text-align: center; border-radius: 8px; margin: 20px 0; cursor: pointer; transition: 0.3s; }
         .upload-area:hover { border-color: var(--gold); background: rgba(243, 156, 18, 0.05); }
@@ -47,14 +79,16 @@
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #222; color: white; border-radius: 6px; outline: none; }
         input:focus { border-color: var(--gold); }
 
+        /* --- DATA TABLE --- */
         .table-container { margin-top: 30px; overflow-x: auto; }
         table { width: 100%; min-width: 500px; border-collapse: collapse; }
         th { text-align: left; color: #444; font-size: 0.65rem; padding: 15px; border-bottom: 1px solid #222; text-transform: uppercase; }
-        td { padding: 12px 15px; border-bottom: 1px solid #111; font-size: 0.8rem; }
+        td { padding: 12px 15px; border-bottom: 1px solid #111; font-size: 0.8rem; vertical-align: middle; }
         .img-preview { width: 45px; height: 45px; border-radius: 4px; object-fit: cover; border: 1px solid #333; }
         .delete-btn { color: #ff4444; background: none; border: none; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .delete-btn:hover { transform: scale(1.2); color: #ff6666; }
 
+        /* --- RESPONSIVE ADJUSTMENTS --- */
         @media (min-width: 1024px) {
             .menu-toggle { display: none; }
             .sidebar { left: 0; }
@@ -74,10 +108,10 @@
             <div class="brand-text">ROCKY HOUSE<span>of Essentials</span></div>
         </div>
         <nav class="nav-list">
-            <a class="nav-item active" onclick="toggleMenu()"><i class="fas fa-box"></i> Dashboard</a>
+            <a class="nav-item active"><i class="fas fa-box"></i> Dashboard</a>
             <a href="shop.html" class="nav-item"><i class="fas fa-shopping-bag"></i> View Shop</a>
             <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home Page</a>
-            <a class="nav-item" onclick="logout()" style="margin-top: 30px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a class="nav-item" onclick="logout()" style="margin-top: 30px; color: #ff4444;"><i class="fas fa-sign-out-alt"></i> Logout Admin</a>
         </nav>
     </aside>
 
@@ -101,7 +135,7 @@
             </div>
             <div class="stat-card">
                 <h4>Status</h4>
-                <p id="cloudStatus" style="color: #00ff7f; font-size: 0.8rem;">● Checking Sync...</p>
+                <p id="cloudStatus" style="color: #666; font-size: 0.8rem;">● Waiting for Login</p>
             </div>
         </section>
 
@@ -124,7 +158,7 @@
                     </div>
                 </div>
 
-                <div class="upload-area" id="dropZone" onclick="document.getElementById('pImgFile').click()">
+                <div class="upload-area" onclick="document.getElementById('pImgFile').click()">
                     <div id="uploadUi">
                         <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;"></i>
                         <p style="font-size: 0.8rem; color: #888;">Tap to select product image</p>
@@ -146,38 +180,55 @@
     </main>
 
     <script>
-        // CONFIG: Pulling from Vercel Injected Window Object
         const SB_URL = (window.SUPABASE_URL || "").trim();
         const SB_KEY = (window.SUPABASE_KEY || "").trim();
-        
         let _supabase;
-        if (SB_URL && SB_KEY) {
-            _supabase = supabase.createClient(SB_URL, SB_KEY);
-        }
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
 
-        // --- AUTH ---
-        if(localStorage.getItem('rocky_admin') !== 'true') {
-            let pass = prompt("Access Key:");
-            if(pass === "rocky2026") { localStorage.setItem('rocky_admin', 'true'); } 
-            else { window.location.href = "index.html"; }
-        }
-        function logout() { localStorage.removeItem('rocky_admin'); window.location.reload(); }
+        // --- STABLE AUTH: Wait for load before prompting ---
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('rocky_admin') !== 'true') {
+                let pass = prompt("Access Key Required:");
+                if (pass === "rocky2026") {
+                    localStorage.setItem('rocky_admin', 'true');
+                    initSupabase();
+                } else {
+                    alert("Unauthorized Access.");
+                    window.location.href = "index.html";
+                }
+            } else {
+                initSupabase();
+            }
+        });
 
-        // --- FIXED IMAGE PREVIEW ---
+        function logout() { 
+            localStorage.removeItem('rocky_admin'); 
+            window.location.href = "index.html"; 
+        }
+
+        function initSupabase() {
+            if (SB_URL && SB_KEY) {
+                _supabase = supabase.createClient(SB_URL, SB_KEY);
+                loadProducts();
+            } else {
+                document.getElementById('cloudStatus').innerText = "● Config Missing (Vercel)";
+                document.getElementById('cloudStatus').style.color = "orange";
+            }
+        }
+
+        // --- IMAGE HANDLING ---
         let selectedFile = null;
         function previewImage(input) {
             const preview = document.getElementById('imagePreview');
             const ui = document.getElementById('uploadUi');
-            
             if (input.files && input.files[0]) {
                 selectedFile = input.files[0];
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     preview.src = e.target.result;
                     preview.style.display = "block";
-                    ui.style.display = "none"; // Hide icon/text
+                    ui.style.display = "none";
                 }
                 reader.readAsDataURL(selectedFile);
             }
@@ -186,19 +237,13 @@
         // --- LOAD DATA ---
         async function loadProducts() {
             const status = document.getElementById('cloudStatus');
-            if(!_supabase) {
-                status.innerText = "● Config Required";
-                status.style.color = "orange";
-                return;
-            }
-
             try {
                 const { data: products, error } = await _supabase.from('essentials').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
 
                 status.innerText = "● Live & Secured";
                 status.style.color = "#00ff7f";
-
+                
                 document.getElementById('totalItems').innerText = products.length;
                 const counts = { "Signature Suits": 0, "Leisure Set": 0, "Solar Utilities": 0, "Books": 0 };
                 products.forEach(p => { if(counts[p.Category] !== undefined) counts[p.Category]++; });
@@ -208,7 +253,7 @@
                 document.getElementById('count-solar').innerText = counts["Solar Utilities"];
                 document.getElementById('count-books').innerText = counts["Books"];
 
-                document.getElementById('inventoryBody').innerHTML = products.map((p) => `
+                document.getElementById('inventoryBody').innerHTML = products.map(p => `
                     <tr>
                         <td><img src="${p.image_url}" class="img-preview"></td>
                         <td>${p.Name}</td>
@@ -217,34 +262,26 @@
                     </tr>
                 `).join('');
             } catch (err) { 
-                status.innerText = "● Handshake Refused";
+                status.innerText = "● Sync Error";
                 status.style.color = "red";
-                console.error(err);
             }
         }
 
         // --- UPLOAD LOGIC ---
         document.getElementById('productForm').onsubmit = async (e) => {
             e.preventDefault();
-            if(!_supabase) return alert("System not configured. Set Vercel variables.");
-            
             const btn = document.getElementById('submitBtn');
-            if(!selectedFile) return alert("Please select an image first!");
+            if(!selectedFile) return alert("Please select an image!");
 
             btn.disabled = true;
-            btn.innerText = "SYNCING TO CLOUD...";
+            btn.innerText = "PUBLISHING...";
 
             try {
                 const fileName = `${Date.now()}-${selectedFile.name.replace(/\s/g, '_')}`;
-                
-                // 1. Storage
                 const { error: uploadError } = await _supabase.storage.from('product-images').upload(fileName, selectedFile);
                 if (uploadError) throw uploadError;
 
-                // 2. URL
                 const { data: urlData } = _supabase.storage.from('product-images').getPublicUrl(fileName);
-                
-                // 3. Database
                 const { error: dbError } = await _supabase.from('essentials').insert([{
                     Name: document.getElementById('pName').value,
                     Category: document.getElementById('pCat').value,
@@ -252,26 +289,19 @@
                 }]);
 
                 if (dbError) throw dbError;
-                alert("Masterpiece Published Successfully.");
+                alert("Masterpiece Published.");
                 location.reload();
-            } catch (err) { 
-                alert("Upload Failed: " + err.message); 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerText = "PUBLISH TO HOUSE"; 
-            }
+            } catch (err) { alert("Error: " + err.message); } 
+            finally { btn.disabled = false; btn.innerText = "PUBLISH TO HOUSE"; }
         };
 
         async function deleteProduct(id) {
-            if(!_supabase) return;
             if(confirm("Permanently remove this item?")) {
                 const { error } = await _supabase.from('essentials').delete().eq('id', id);
-                if (error) alert("Action failed: " + error.message);
+                if (error) alert("Action failed");
                 else loadProducts();
             }
         }
-
-        window.onload = loadProducts;
     </script>
 </body>
 </html>
