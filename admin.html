@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Admin | Rocky House</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #f39c12;
+            --onyx: #0a0a0a;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #050505; 
+            color: var(--white); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- MOBILE HAMBURGER --- */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 10px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block; 
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--onyx);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: -100%; 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1500;
+        }
+
+        .sidebar.active { left: 0; }
+
+        /* BRAND STYLING */
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .admin-logo-img { width: 42px; height: 42px; object-fit: contain; }
+
+        .brand-text { 
+            font-family: 'Playfair Display', serif; 
+            color: var(--gold); 
+            font-size: 1.1rem; 
+            line-height: 1;
+            letter-spacing: 1px;
+        }
+
+        .brand-text span {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            color: #555;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .nav-list { list-style: none; }
+        .nav-item {
+            padding: 15px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.3s;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active { background: var(--glass); color: var(--gold); }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 80px 20px 40px; 
+            width: 100%;
+            transition: 0.4s;
+        }
+
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; }
+        .header p { font-size: 0.7rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* --- STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--onyx);
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+
+        .stat-card h4 { font-size: 0.6rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-card p { font-size: 1.4rem; font-weight: 600; color: var(--gold); }
+
+        .cat-detail { font-size: 0.75rem; color: #888; display: flex; justify-content: space-between; margin-top: 5px;}
+
+        /* --- FORM --- */
+        .admin-box {
+            background: var(--onyx);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .upload-area {
+            border: 2px dashed #333;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        #imagePreview { width: 100%; max-width: 200px; border-radius: 8px; display: none; margin-top: 10px; border: 1px solid var(--gold); }
+
+        .form-group { margin-bottom: 15px; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid #222;
+            color: white;
+            border-radius: 6px;
+        }
+
+        /* --- TABLE --- */
+        .table-container { margin-top: 30px; overflow-x: auto; }
+        table { width: 100%; min-width: 500px; border-collapse: collapse; }
+        th { text-align: left; color: #444; font-size: 0.65rem; padding: 15px; border-bottom: 1px solid #222; }
+        td { padding: 12px 15px; border-bottom: 1px solid #111; font-size: 0.8rem; }
+        .img-preview { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+
+        .delete-btn { color: #ff4444; background: none; border: none; cursor: pointer; }
+
+        @media (min-width: 1024px) {
+            .menu-toggle { display: none; }
+            .sidebar { left: 0; }
+            .main-content { margin-left: var(--sidebar-width); padding: 40px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="admin-brand">
+            <img src="logo.png" class="admin-logo-img" alt="Logo">
+            <div class="brand-text">
+                ROCKY HOUSE
+                <span>of Essentials</span>
+            </div>
+        </div>
+
+        <nav class="nav-list">
+            <a href="#" class="nav-item active" onclick="toggleMenu()"><i class="fas fa-box"></i> Dashboard</a>
+            <a href="shop.html" class="nav-item"><i class="fas fa-shopping-bag"></i> View Shop</a>
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home Page</a>
+            <a href="#" class="nav-item" onclick="logout()" style="margin-top: 30px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+
+        <a href="https://wa.me/2349164955650" style="margin-top: auto; color: #333; font-size: 0.6rem; text-decoration: none; text-align: center;">BY BROTOBRO</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Executive Portal</h1>
+            <p>Admin Control Panel</p>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Essentials</h4>
+                <p id="totalItems">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Category Breakdown</h4>
+                <div class="cat-detail"><span>Suits:</span> <span id="count-suit" style="color:var(--gold)">0</span></div>
+                <div class="cat-detail"><span>Leisure:</span> <span id="count-collection" style="color:var(--gold)">0</span></div>
+                <div class="cat-detail"><span>Solar:</span> <span id="count-solar" style="color:var(--gold)">0</span></div>
+                <div class="cat-detail"><span>Books:</span> <span id="count-books" style="color:var(--gold)">0</span></div>
+            </div>
+            <div class="stat-card">
+                <h4>Status</h4>
+                <p id="cloudStatus" style="color: #00ff7f; font-size: 0.8rem;">● Live & Secured</p>
+            </div>
+        </section>
+
+        <section class="admin-box">
+            <h2 style="font-family: 'Playfair Display'; margin-bottom: 20px;">Upload Content</h2>
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label style="font-size: 0.7rem; color: #666;">PRODUCT NAME</label>
+                        <input type="text" id="pName" placeholder="Item Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size: 0.7rem; color: #666;">CATEGORY</label>
+                        <select id="pCat">
+                            <option value="suit">Signature Suits</option>
+                            <option value="collection">Leisure Sets</option>
+                            <option value="solar">Solar Utilities</option>
+                            <option value="books">Digital Library</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('pImgFile').click()">
+                    <i class="fas fa-image" style="font-size: 1.5rem; color: #444;"></i>
+                    <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">Pick image from Gallery</p>
+                    <input type="file" id="pImgFile" accept="image/*" hidden onchange="previewImage(this)">
+                    <img id="imagePreview" alt="Preview">
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-add" style="background:var(--gold); color:black; border:none; width:100%; padding:15px; font-weight:700; border-radius:5px; cursor:pointer;">PUBLISH TO SHOP</button>
+            </form>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Img</th>
+                            <th>Name</th>
+                            <th>Cat</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- 1. CLOUD CONFIGURATION ---
+        const supabaseUrl = 'https://yfunigwzprvbtbpxxpio.supabase.co';
+        const supabaseKey = 'YOUR_ANON_KEY_HERE'; // Replace with your real key
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dftw5bcsh/image/upload';
+        const CLOUDINARY_PRESET = 'rocky_house_preset';
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // --- 2. AUTHENTICATION ---
+        if(localStorage.getItem('rocky_admin') !== 'true') {
+            let pass = prompt("Access Key:");
+            if(pass === "rocky2026") { localStorage.setItem('rocky_admin', 'true'); } 
+            else { window.location.href = "index.html"; }
+        }
+
+        function logout() { localStorage.removeItem('rocky_admin'); window.location.reload(); }
+
+        // --- 3. IMAGE PREVIEW ---
+        let selectedFile = null;
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                }
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        // --- 4. CLOUD FETCHING ---
+        async function loadProducts() {
+            try {
+                const { data: products, error } = await _supabase
+                    .from('essentials')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                document.getElementById('totalItems').innerText = products.length;
+
+                const counts = { suit: 0, collection: 0, solar: 0, books: 0 };
+                products.forEach(p => {
+                    if(counts[p.category] !== undefined) counts[p.category]++;
+                });
+
+                for(let cat in counts) {
+                    const el = document.getElementById(`count-${cat}`);
+                    if(el) el.innerText = counts[cat];
+                }
+
+                const inventoryBody = document.getElementById('inventoryBody');
+                inventoryBody.innerHTML = products.map((p) => `
+                    <tr>
+                        <td><img src="${p.image_url}" class="img-preview"></td>
+                        <td>${p.name}</td>
+                        <td>${p.category}</td>
+                        <td><button class="delete-btn" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Fetch error:", err.message);
+            }
+        }
+
+        // --- 5. CLOUD PUBLISHING ---
+        document.getElementById('productForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('cloudStatus');
+
+            if(!selectedFile) return alert("Please select an image first.");
+
+            btn.disabled = true;
+            btn.innerText = "UPLOADING TO CLOUD...";
+            status.style.color = "orange";
+            status.innerText = "● Syncing...";
+
+            try {
+                // Step A: Upload to Cloudinary
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('upload_preset', CLOUDINARY_PRESET);
+
+                const cloudRes = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                const cloudData = await cloudRes.json();
+                const imageUrl = cloudData.secure_url;
+
+                if (!imageUrl) throw new Error("Image upload failed");
+
+                // Step B: Save to Supabase
+                const { error } = await _supabase
+                    .from('essentials')
+                    .insert([{
+                        name: document.getElementById('pName').value,
+                        category: document.getElementById('pCat').value,
+                        image_url: imageUrl
+                    }]);
+
+                if (error) throw error;
+
+                alert("Success! Item published to shop.");
+                e.target.reset();
+                document.getElementById('imagePreview').style.display = "none";
+                selectedFile = null;
+                loadProducts();
+
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "PUBLISH TO SHOP";
+                status.style.color = "#00ff7f";
+                status.innerText = "● Live & Secured";
+            }
+        };
+
+        // --- 6. CLOUD DELETING ---
+        async function deleteProduct(id) {
+            if(confirm("Permanently remove this item from the cloud?")) {
+                const { error } = await _supabase
+                    .from('essentials')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) alert("Delete failed: " + error.message);
+                else loadProducts();
+            }
+        }
+
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>
