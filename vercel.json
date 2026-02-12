@@ -1,0 +1,6 @@
+{
+  "env": {
+    "SUPABASE_URL": "@https://yfunigwzprvbtbpxxpio.supabase.co",
+    "SUPABASE_KEY": "@eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmdW5pZ3d6cHJ2YnRicHh4cGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NzUyMTMsImV4cCI6MjA4NjQ1MTIxM30.-Bi0zWPS7cOYpY6nhWav0KvuI19Nb95BUfhRz80q2Nk"
+  }
+}
