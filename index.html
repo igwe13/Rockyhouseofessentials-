@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocky House of Essentials | Adaptability & Flexibility</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --gold: #f39c12;
+            --onyx: #0a0a0a;
+            --white: #ffffff;
+            --deep-black: #050505;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--onyx); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+        /* LUXURY NAVBAR */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            background: rgba(255,255,255,0.98); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+        .logo-img { height: 45px; width: 45px; object-fit: contain; }
+        .logo-text h1 { font-family: 'Playfair Display', serif; font-size: 1.1rem; line-height: 1; letter-spacing: 1px; }
+        .logo-text span { font-size: 0.55rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; display: block; margin-top: 3px; }
+
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+        .cart-link { position: relative; color: var(--gold); font-size: 1.4rem; text-decoration: none; }
+        .cart-badge {
+            position: absolute; top: -8px; right: -10px;
+            background: var(--onyx); color: white;
+            font-size: 0.65rem; padding: 2px 6px; border-radius: 50%;
+            font-weight: 700; border: 1px solid var(--gold);
+            display: none; /* Hidden by default until cart has items */
+        }
+
+        .nav-right { cursor: pointer; z-index: 2001; font-size: 1.2rem; }
+
+        /* MENU OVERLAY */
+        .menu-overlay {
+            position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
+            background: var(--deep-black); z-index: 2000; transition: 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .menu-overlay.active { right: 0; }
+        .menu-overlay a { color: white; font-size: 2rem; text-decoration: none; margin: 15px 0; font-family: 'Playfair Display', serif; transition: 0.3s; }
+        .menu-overlay a:hover { color: var(--gold); }
+        .close-menu { position: absolute; top: 30px; right: 5%; color: white; font-size: 2.5rem; cursor: pointer; }
+
+        /* HERO SLIDER */
+        .hero-slider-container {
+            margin-top: 80px; width: 100%; position: relative; background: #000;
+            aspect-ratio: 16 / 9; max-height: 70vh; overflow: hidden;
+        }
+        .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; }
+        .slide.active { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+        .slider-bullets {
+            position: absolute; bottom: 15px; left: 50%;
+            transform: translateX(-50%); display: flex; gap: 10px; z-index: 10;
+        }
+        .bullet { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s; }
+        .bullet.active { background: var(--gold); width: 25px; border-radius: 5px; }
+
+        /* INTRO TEXT */
+        .hero-intro-text { padding: 80px 5%; text-align: center; background: var(--white); }
+        .hero-intro-text p { font-size: 0.85rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 15px; font-weight: 600; }
+        .hero-intro-text h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.2; margin-bottom: 30px; color: var(--onyx); }
+        .btn-gold {
+            background: var(--gold); color: white; padding: 18px 45px;
+            text-decoration: none; font-weight: 600; font-size: 0.85rem;
+            letter-spacing: 2px; transition: 0.3s; border-radius: 2px;
+            display: inline-block; text-transform: uppercase;
+        }
+
+        /* COLLECTION GRID */
+        .collection-grid { padding: 0 5% 100px; display: grid; grid-template-columns: 1fr; gap: 25px; }
+        @media (min-width: 768px) { .collection-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .category-card {
+            height: 480px; position: relative; overflow: hidden;
+            display: flex; align-items: flex-end; padding: 40px; text-decoration: none;
+            background-color: #111; border-radius: 4px;
+        }
+        .card-images-container { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease-in-out; }
+        .card-img.active { opacity: 1; }
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 5%, transparent 60%); z-index: 1; }
+        .card-text { position: relative; color: white; z-index: 2; }
+        .card-text h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 8px; }
+        .card-text p { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); }
+
+        /* FOOTER */
+        footer { background: var(--deep-black); color: #f4f4f4; padding: 80px 5% 40px; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 50px; max-width: 1200px; margin: 0 auto; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr; } }
+        .footer-brand h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 20px; font-size: 1.8rem; }
+        .footer-header { color: var(--white); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; font-weight: 600; }
+        .social-links { display: flex; gap: 15px; margin-top: 20px; }
+        .social-links a { color: var(--white); font-size: 1.2rem; width: 40px; height: 40px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; border-radius: 50%; text-decoration: none; transition: 0.3s;}
+        .social-links a:hover { background: var(--gold); }
+        .footer-list { list-style:none; color:#888; font-size:0.9rem; line-height: 2.5; }
+        .footer-list li a { color: #888; text-decoration: none; transition: 0.3s; }
+        .footer-list li a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid #1a1a1a; margin-top: 60px; padding-top: 30px; text-align: center; font-size: 0.75rem; color: #444; }
+
+        /* PREMIUM DEV SIGNATURE */
+        .dev-signature {
+            margin-top: 40px; padding-top: 20px; text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+        .dev-signature a {
+            text-decoration: none; color: rgba(255,255,255,0.3);
+            font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
+            transition: 0.5s; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .dev-signature a:hover { color: var(--gold); letter-spacing: 4px; }
+
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; z-index: 2000; text-decoration: none; box-shadow: 0 10px 20px rgba(0,0,0,0.2);}
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" id="closeBtn">×</div>
+        <a href="shop.html">OUR SHOP</a>
+        <a href="selection.html">MY SELECTION</a>
+        <a href="contact.html">CONTACT US</a>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo-img">
+            <div class="logo-text">
+                <h1>ROCKY</h1>
+                <span>House of Essentials</span>
+            </div>
+        </a>
+        <div class="nav-actions">
+            <a href="selection.html" class="cart-link">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="cart-badge" id="cartCount">0</span>
+            </a>
+            <div class="nav-right" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-slider-container">
+        <div class="slide active"><img src="flyer1.jpg" alt="Flyer 1"></div>
+        <div class="slide"><img src="flyer2.jpg" alt="Flyer 2"></div>
+        <div class="slide"><img src="flyer3.jpg" alt="Flyer 3"></div>
+        <div class="slide"><img src="flyer4.jpg" alt="Flyer 4"></div>
+        <div class="slider-bullets">
+            <div class="bullet active" onclick="manualSlide(0)"></div>
+            <div class="bullet" onclick="manualSlide(1)"></div>
+            <div class="bullet" onclick="manualSlide(2)"></div>
+            <div class="bullet" onclick="manualSlide(3)"></div>
+        </div>
+    </div>
+
+    <section class="hero-intro-text">
+        <p>Adaptability & Flexibility</p>
+        <h2>Redefining Modern Essentials</h2>
+        <a href="shop.html" class="btn-gold">Explore the Shop</a>
+    </section>
+
+    <section class="collection-grid">
+        <a href="shop.html?cat=suit" class="category-card">
+            <div class="card-images-container">
+                <img src="men1.jpg" class="card-img active">
+                <img src="men2.jpg" class="card-img">
+                <img src="men3.jpg" class="card-img">
+            </div>
+            <div class="card-overlay"></div>
+            <div class="card-text">
+                <h3>Signature Suits</h3>
+                <p>Luxury Tailoring</p>
+            </div>
+        </a>
+
+        <a href="shop.html?cat=collection" class="category-card">
+            <div class="card-images-container">
+                <img src="leisure1.jpg" class="card-img active">
+                <img src="leisure2.jpg" class="card-img">
+            </div>
+            <div class="card-overlay"></div>
+            <div class="card-text">
+                <h3>Leisure Sets</h3>
+                <p>Curated Menswear</p>
+            </div>
+        </a>
+
+        <a href="shop.html?cat=solar" class="category-card">
+            <div class="card-images-container">
+                <img src="solar1.jpg" class="card-img active">
+                <img src="solar2.jpg" class="card-img">
+            </div>
+            <div class="card-overlay"></div>
+            <div class="card-text">
+                <h3>Solar Utilities</h3>
+                <p>Sustainable Power</p>
+            </div>
+        </a>
+
+        <a href="shop.html?cat=books" class="category-card">
+            <div class="card-images-container">
+                <img src="book1.jpg" class="card-img active">
+                <img src="book2.jpg" class="card-img">
+            </div>
+            <div class="card-overlay"></div>
+            <div class="card-text">
+                <h3>Knowledge Base</h3>
+                <p>Curated Essentials & Books</p>
+            </div>
+        </a>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h2>Rocky House Of Essentials</h2>
+                <p>Curating quality essentials with a focus on adaptability and long-term value for the modern individual.</p>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/rocky_house_of_essential" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/share/1GvMN8L32n" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.tiktok.com/@rockyhouseofessential" target="_blank"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-contact">
+                <h4 class="footer-header">Reach Out</h4>
+                <ul class="footer-list">
+                    <li><a href="mailto:dunyobea187@gmail.com"><i class="far fa-envelope"></i> dunyobea187@gmail.com</a></li>
+                    <li><a href="tel:+233241520909"><i class="fas fa-phone"></i> +233 241 520 909</a></li>
+                    <li><a href="shop.html">Browse Shop</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 ROCKY HOUSE OF ESSENTIALS.</div>
+
+        <div class="dev-signature">
+            <a href="https://wa.me/2349164955650" target="_blank">
+                Developed by BroToBro <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+            </a>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/233241520909" class="wa-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+
+    <script>
+        // --- 1. CLOUD CONNECTION ---
+        // Replace with your actual Supabase URL and Anon Key
+        const supabaseUrl = 'https://yfunigwzprvbtbpxxpio.supabase.co';
+        const supabaseKey = 'YOUR_ANON_KEY_HERE';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- 2. NAVIGATION ---
+        const menuBtn = document.getElementById('menuBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        menuBtn.onclick = () => menuOverlay.classList.add('active');
+        closeBtn.onclick = () => menuOverlay.classList.remove('active');
+
+        // --- 3. HERO SLIDER ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const bullets = document.querySelectorAll('.bullet');
+        let slideInterval;
+
+        const showSlide = (n) => {
+            slides.forEach(s => s.classList.remove('active'));
+            bullets.forEach(b => b.classList.remove('active'));
+            if(slides[n]) slides[n].classList.add('active');
+            if(bullets[n]) bullets[n].classList.add('active');
+            currentSlide = n;
+        };
+
+        const manualSlide = (n) => {
+            showSlide(n);
+            resetTimer();
+        };
+
+        const resetTimer = () => {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => showSlide((currentSlide + 1) % slides.length), 5000);
+        };
+        resetTimer();
+
+        // --- 4. CARD IMAGE ROTATION ---
+        setInterval(() => {
+            document.querySelectorAll('.category-card').forEach(card => {
+                const imgs = card.querySelectorAll('.card-img');
+                if (imgs.length <= 1) return;
+                let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+                imgs[activeIdx].classList.remove('active');
+                let nextIdx = (activeIdx + 1) % imgs.length;
+                imgs[nextIdx].classList.add('active');
+            });
+        }, 3500);
+
+        // --- 5. INITIALIZATION & CART ---
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            // You could also fetch "Featured Items" from Supabase here if you wanted!
+        });
+
+        function updateCartCount() {
+            // LocalStorage works perfectly on Vercel for cart persistence
+            const cart = JSON.parse(localStorage.getItem('rocky_cart')) || [];
+            const cartCountEl = document.getElementById('cartCount');
+            if(cartCountEl) {
+                cartCountEl.innerText = cart.length;
+                // Only show badge if there are items
+                cartCountEl.style.display = cart.length > 0 ? 'block' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
