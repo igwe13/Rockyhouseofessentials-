@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Private Suite | Rocky House of Essentials</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --gold: #f39c12; 
+            --onyx: #0a0a0a; 
+            --white: #ffffff;
+            --soft-gray: #fcfcfc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--soft-gray); 
+            color: var(--onyx); 
+            line-height: 1.6;
+        }
+
+        /* LUXURY NAV */
+        .luxury-nav {
+            padding: 40px 5%;
+            display: flex;
+            justify-content: center;
+            background: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* HEADER */
+        .suite-header {
+            padding: 80px 5% 40px;
+            text-align: center;
+            background: white;
+        }
+
+        .suite-header span {
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 0.75rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .suite-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 7vw, 4rem);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* SELECTION CONTAINER */
+        .selection-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        .item-list {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .luxury-card {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            align-items: center;
+            background: white;
+            padding: 25px;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .img-wrap {
+            width: 150px;
+            height: 180px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .item-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            padding: 0 35px;
+        }
+
+        .item-details h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 400;
+            color: #222;
+        }
+
+        /* QUANTITY TOGGLE */
+        .qty-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #eee;
+            width: fit-content;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .qty-btn:hover { background: #f0f0f0; }
+
+        .qty-val {
+            width: 45px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .remove-trigger {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .remove-trigger:hover { color: #ff4444; }
+
+        /* STATIC BOTTOM ORDER SECTION */
+        .order-section-bottom {
+            margin-top: 50px;
+            padding: 80px 0;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .total-display {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .total-display b {
+            color: var(--gold);
+        }
+
+        .whatsapp-order-btn {
+            background: var(--onyx);
+            color: white;
+            padding: 25px 80px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: 0.4s;
+            display: inline-block;
+        }
+
+        .whatsapp-order-btn:hover {
+            background: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .empty-suite { text-align: center; padding: 100px 0; }
+        .back-link { color: var(--gold); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid; padding-bottom: 5px; }
+
+        @media (max-width: 768px) {
+            .luxury-card { grid-template-columns: 1fr; text-align: center; }
+            .img-wrap { margin: 0 auto 20px; }
+            .item-details { padding: 0 0 20px; }
+            .qty-box { margin: 0 auto; }
+            .whatsapp-order-btn { width: 100%; padding: 20px 0; letter-spacing: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="luxury-nav">
+        <div class="brand-logo" onclick="location.href='index.html'">ROCKY HOUSE OF ESSENTIALS</div>
+    </nav>
+
+    <header class="suite-header">
+        <span>Curated Selection</span>
+        <h1>The Private Suite</h1>
+    </header>
+
+    <main class="selection-wrapper">
+        <div id="selectionList" class="item-list"></div>
+
+        <div class="order-section-bottom" id="orderBar" style="display: none;">
+            <div class="total-display">Total Curated Units: <b id="totalQty">0</b></div>
+            <button class="whatsapp-order-btn" onclick="sendToWhatsApp()">
+                Finalize & Message Concierge
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let cartItems = [];
+
+        function loadSelection() {
+            const rawCart = JSON.parse(localStorage.getItem('rocky_cart')) || [];
+            const grouped = {};
+
+            rawCart.forEach(item => {
+                if (item && item.id) {
+                    // Adapt to Cloud Pattern: Check for img or image_url
+                    const imageUrl = item.img || item.image_url;
+                    
+                    if (grouped[item.id]) { 
+                        grouped[item.id].qty += 1; 
+                    } else { 
+                        grouped[item.id] = { 
+                            id: item.id, 
+                            name: item.name, 
+                            img: imageUrl, 
+                            qty: 1 
+                        }; 
+                    }
+                }
+            });
+            cartItems = Object.values(grouped);
+            render();
+        }
+
+        function render() {
+            const list = document.getElementById('selectionList');
+            const orderBar = document.getElementById('orderBar');
+            const totalQtyDisplay = document.getElementById('totalQty');
+
+            if (cartItems.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-suite">
+                        <h2>Your Suite is Empty</h2>
+                        <br>
+                        <a href="shop.html" class="back-link">Return to Shop</a>
+                    </div>`;
+                orderBar.style.display = 'none';
+                return;
+            }
+
+            orderBar.style.display = 'block';
+            list.innerHTML = '';
+            let totalQty = 0;
+
+            cartItems.forEach((item, index) => {
+                totalQty += item.qty;
+                list.innerHTML += `
+                    <div class="luxury-card">
+                        <div class="img-wrap">
+                            <img src="${item.img}" class="item-img" onerror="this.src='https://via.placeholder.com/400x500?text=Rocky'">
+                        </div>
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <div class="qty-box">
+                                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                                <span class="qty-val">${item.qty}</span>
+                                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                            </div>
+                            <span class="remove-trigger" onclick="removeItem(${index})">Remove From Suite</span>
+                        </div>
+                    </div>
+                `;
+            });
+            totalQtyDisplay.innerText = totalQty;
+        }
+
+        function updateQty(index, change) {
+            cartItems[index].qty += change;
+            if (cartItems[index].qty < 1) cartItems[index].qty = 1;
+            sync();
+        }
+
+        function removeItem(index) {
+            cartItems.splice(index, 1);
+            sync();
+        }
+
+        // Keep LocalStorage in sync with quantity changes
+        function sync() {
+            const flat = [];
+            cartItems.forEach(item => {
+                for(let i=0; i < item.qty; i++) {
+                    flat.push({ 
+                        id: item.id, 
+                        name: item.name, 
+                        img: item.img 
+                    });
+                }
+            });
+            localStorage.setItem('rocky_cart', JSON.stringify(flat));
+            render();
+        }
+
+        function sendToWhatsApp() {
+            const phoneNumber = "233241520909"; 
+            let message = "*ROCKY HOUSE OF ESSENTIALS*%0A";
+            message += "*NEW PRIVATE SUITE ORDER*%0A";
+            message += "----------------------------%0A%0A";
+
+            cartItems.forEach((item, i) => {
+                message += `*Item ${i + 1}:* ${encodeURIComponent(item.name)}%0A`;
+                message += `*Quantity:* ${item.qty}%0A`;
+                message += `*Reference:* ${encodeURIComponent(item.img)}%0A%0A`;
+            });
+
+            const total = cartItems.reduce((acc, item) => acc + item.qty, 0);
+            message += "----------------------------%0A";
+            message += `*Total Units:* ${total}%0A`;
+            message += "----------------------------%0A%0A";
+            message += "_Hello Concierge, I have finalized my selection. Please confirm availability and processing._";
+
+            const url = `https://wa.me/${phoneNumber}?text=${message}`;
+            window.open(url, '_blank').focus();
+        }
+
+        window.onload = loadSelection;
+    </script>
+</body>
+</html>
