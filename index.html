@@ -260,13 +260,23 @@
     </footer>
 
     <a href="https://wa.me/233241520909" class="wa-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
-
     <script>
         // --- 1. CLOUD CONNECTION ---
-        // Replace with your actual Supabase URL and Anon Key
-        const supabaseUrl = 'https://yfunigwzprvbtbpxxpio.supabase.co';
-        const supabaseKey = 'YOUR_ANON_KEY_HERE';
+        // CONNECTED TO YOUR NEW VAULT: tjoahroodblnkynggtxh
+        const supabaseUrl = 'https://tjoahroodblnkynggtxh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqb2Focm9vZGJsbmt5bmdndHhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5ODQ0NjAsImV4cCI6MjA4ODU2MDQ2MH0._EwRQbIci5FYJepk2KLDYKSCtvJCgMHxilUdrDaA_Bo';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- NEW: SUPABASE KEEP-ALIVE HEARTBEAT ---
+        // This prevents Supabase from pausing your project due to inactivity
+        async function keepHouseAwake() {
+            try {
+                await _supabase.from('essentials').select('id').limit(1);
+                console.log("Rocky House Heartbeat: Active");
+            } catch (e) {
+                console.log("Heartbeat failed, but site is loading.");
+            }
+        }
 
         // --- 2. NAVIGATION ---
         const menuBtn = document.getElementById('menuBtn');
@@ -316,16 +326,14 @@
         // --- 5. INITIALIZATION & CART ---
         window.addEventListener('DOMContentLoaded', () => {
             updateCartCount();
-            // You could also fetch "Featured Items" from Supabase here if you wanted!
+            keepHouseAwake(); // Trigger the heartbeat on every visit
         });
 
         function updateCartCount() {
-            // LocalStorage works perfectly on Vercel for cart persistence
             const cart = JSON.parse(localStorage.getItem('rocky_cart')) || [];
             const cartCountEl = document.getElementById('cartCount');
             if(cartCountEl) {
                 cartCountEl.innerText = cart.length;
-                // Only show badge if there are items
                 cartCountEl.style.display = cart.length > 0 ? 'block' : 'none';
             }
         }
